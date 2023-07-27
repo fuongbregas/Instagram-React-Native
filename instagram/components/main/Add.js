@@ -1,26 +1,31 @@
 import { Camera, CameraType } from 'expo-camera';
 import { useEffect, useState } from 'react';
 import { Button, Text, View, StyleSheet, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 const Add = () => {
     const [type, setType] = useState(CameraType.back);
-    const [permission, setPermission] = useState(null);
+    const [cameraPermission, setCameraPermission] = useState(null);
+    const [galleryPermission, setGalleryPermission] = useState(null);
     const [camera, setCamera] = useState(null);
     const [image, setImage] = useState(null);
 
     useEffect(() => {
         (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setPermission(status === 'granted');
+            const cameraStatus = await Camera.requestCameraPermissionsAsync();
+            setCameraPermission(cameraStatus.status === 'granted');
+
+            const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            setGalleryPermission(galleryStatus.status === 'granted');
         })();
     }, []);
 
-    if (permission === null) {
+    if (cameraPermission === null || galleryPermission === null) {
         // Camera permissions are still loading
         return <View />;
     }
     // Camera permissions are not granted yet
-    if (permission === false) {
+    if (cameraPermission === false || galleryPermission === false) {
         return <Text>No access to camera</Text>;
     }
 
@@ -35,6 +40,22 @@ const Add = () => {
         }
     }
 
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        console.log(result);
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    };
+
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.cameraContainer}>
@@ -43,7 +64,8 @@ const Add = () => {
 
             <Button title='Flip Image' onPress={toggleCameraType} />
             <Button title='Take Photo' onPress={takePhoto} />
-            {image && <Image source = {{uri : image}} style={{flex: 1}}/>}
+            <Button title='Pick Photo from Gallery' onPress={pickImage} />
+            {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
         </View>
     );
 }
