@@ -66,6 +66,7 @@ const Add = () => {
             <Button title='Take Photo' onPress={takePhoto} />
             <Button title='Pick Photo from Gallery' onPress={pickImage} />
             {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
+            <Button title='Pick Photo from Gallery' onPress={navigation.navigate("Save")} />
         </View>
     );
 }
