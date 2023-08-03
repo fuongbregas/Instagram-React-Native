@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button, Text, View, StyleSheet, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-const Add = () => {
+const Add = (props) => {
     const [type, setType] = useState(CameraType.back);
     const [cameraPermission, setCameraPermission] = useState(null);
     const [galleryPermission, setGalleryPermission] = useState(null);
@@ -66,7 +66,7 @@ const Add = () => {
             <Button title='Take Photo' onPress={takePhoto} />
             <Button title='Pick Photo from Gallery' onPress={pickImage} />
             {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
-            <Button title='Pick Photo from Gallery' onPress={navigation.navigate("Save")} />
+            <Button title='Save Photo' onPress={() => props.navigation.navigate('Save', {image})} />
         </View>
     );
 }
